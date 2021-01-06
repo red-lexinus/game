@@ -7,7 +7,7 @@ size = width, height = 800, 800
 
 WIDTH, HEIGHT = width, height
 screen = pg.display.set_mode(size)
-FPS = 50
+FPS = 60
 clock = pg.time.Clock()
 
 
@@ -21,7 +21,7 @@ def load_image(name, colorkey=None):
     return image
 
 
-def first_widow():
+def setting_widow():
     flag = False
     y_pos = 0
     x = 1
@@ -39,8 +39,9 @@ def first_widow():
             if event.type == pg.QUIT:
                 pg.quit()
                 sys.exit()
-            elif flag and event.type == 768:
-                return
+            elif event.type == 768:
+                if event.unicode == '':
+                    return
             elif flag and event.type == pg.MOUSEBUTTONDOWN:
                 try:
                     if event.button == 4:
@@ -51,7 +52,7 @@ def first_widow():
                         x -= 2
                         if x > 0:
                             x = 0
-                    elif event.button == 1 or  event.button  == 3:
+                    elif event.button == 1 or event.button == 3:
                         x = 0
                 except:
                     pass
