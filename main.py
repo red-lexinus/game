@@ -12,5 +12,5 @@ screen = pg.display.set_mode(size)
 FPS = 60
 clock = pg.time.Clock()
 pg.display.set_caption("Перемещение героя")  # заголовок
-first_widow()
-
+setting_widow()
+widow()
