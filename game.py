@@ -2,9 +2,6 @@ import pygame as pg
 import sys
 import os
 import random
-
-weapon = 0
-
 pg.init()
 size = width, height = 800, 800
 
@@ -12,7 +9,7 @@ WIDTH, HEIGHT = width, height
 screen = pg.display.set_mode(size)
 FPS = 60
 clock = pg.time.Clock()
-
+weapon = 1
 
 def load_image(name, colorkey=None):
     fullname = os.path.join('data', name)
@@ -41,7 +38,7 @@ class Enemy(pg.sprite.Sprite):
     def __init__(self, group, x=300, y=400, size=200):
         super().__init__(group)
         self.size = size
-        self.time_delay = 0
+        self.time_delay = random.randint(0, 300)
         self.live = True
         self.original_y = y
         self.image = load_image('enemy_1.png')
@@ -52,19 +49,15 @@ class Enemy(pg.sprite.Sprite):
 
     def update(self, *args):
         global weapon
-        if args and args[0].type == pg.MOUSEBUTTONDOWN:
+        if args and args[0].type == pg.MOUSEBUTTONDOWN and args[0].pos[1] < 600:
+            print(args[0].pos)
             if weapon == 2:
                 self.rect.y = self.original_y
                 self.live = False
                 self.time_delay = random.randint(50, 250)
                 print(self.time_delay)
-            elif self.rect.collidepoint(args[0].pos) and self.live:
+            elif self.rect.collidepoint(args[0].pos) and self.live and args[0].pos[1] < 300:
                 if weapon == 1:
-                    self.rect.y = self.original_y
-                    self.live = False
-                    self.time_delay = random.randint(50, 250)
-                    print(self.time_delay)
-                elif weapon == 0:
                     self.rect.y = self.original_y
                     self.live = False
                     self.time_delay = random.randint(50, 250)
@@ -92,7 +85,46 @@ def return_laptop_sprite_group():
     return all_sprites
 
 
-def widow():
+def return_lower_fon():
+    global scope_weapon
+    all_sprites = pg.sprite.Group()
+    sprite = pg.sprite.Sprite()
+    sprite.image = load_image("game_lower_fon.png")
+    sprite.image = pg.transform.scale(sprite.image, (800, 200))
+    sprite.rect = sprite.image.get_rect()
+    all_sprites.add(sprite)
+    sprite.rect.x = 0
+    sprite.rect.y = 600
+    #
+    sprite_2 = pg.sprite.Sprite()
+    sprite_2.image = load_image("question.png")
+    sprite_2.image = pg.transform.scale(sprite_2.image, (100, 100))
+    sprite_2.rect = sprite_2.image.get_rect()
+    all_sprites.add(sprite_2)
+    sprite_2.rect.x = 0
+    sprite_2.rect.y = 600
+    #
+    sprite_3 = pg.sprite.Sprite()
+    sprite_3.image = load_image("kahoot.png")
+    sprite_3.image = pg.transform.scale(sprite_3.image, (100, 100))
+    sprite_3.rect = sprite_3.image.get_rect()
+    all_sprites.add(sprite_3)
+    sprite_3.rect.x = 0
+    sprite_3.rect.y = 700
+    #
+    scope_weapon = pg.sprite.Sprite()
+    scope_weapon.image = load_image("scope_weapon.png")
+    scope_weapon.image = pg.transform.scale(scope_weapon.image, (50, 50))
+    scope_weapon.rect = scope_weapon.image.get_rect()
+    all_sprites.add(scope_weapon)
+    scope_weapon.rect.x = 96
+    scope_weapon.rect.y = 620
+    # 96, 620. 100, 730
+    return all_sprites
+
+
+def widow(time=60):
+    global  weapon
     all_sprites = pg.sprite.Group()
     cursor_sprite = pg.sprite.Group()
     laptops = return_laptop_sprite_group()
@@ -101,37 +133,52 @@ def widow():
     Enemy(all_sprites, 50, 300)
     Enemy(all_sprites, 300, 300)
     Enemy(all_sprites, 550, 300)
+    lower_fon = return_lower_fon()
+    weapon = 1
 
     while True:
         if bot_interaction_flag:
             all_sprites.update(n)
         screen.fill('white')
         for event in pg.event.get():
-            if not bot_interaction_flag:
-                n = event
-                bot_interaction_flag = True
+            try:
+                if not bot_interaction_flag:
+                    n = event
+                    bot_interaction_flag = True
 
-            elif event.type == pg.QUIT:
-                pg.quit()
-                sys.exit()
-            elif event.type == 768:
-                if event.unicode == '':
-                    return
-            elif event.type == pg.MOUSEMOTION:
-                if event.pos[1] >= 600:
-                    cursor.image = load_image('cursor.png')
-                    cursor.image = pg.transform.scale(cursor.image, (cursor.size, cursor.size))
-                else:
-                    cursor.image = load_image('scope.png')
-                    cursor.image = pg.transform.scale(cursor.image, (cursor.size, cursor.size))
+                elif event.type == pg.QUIT:
+                    pg.quit()
+                    sys.exit()
+                elif event.type == 768:
+                    if event.unicode == '':
+                        return
+                elif event.type == pg.KEYUP:
+                    if event.unicode == '1':
+                        scope_weapon.rect.x = 96
+                        scope_weapon.rect.y = 620
+                        weapon = 1
+                    elif event.unicode == '2':
+                        scope_weapon.rect.x = 100
+                        scope_weapon.rect.y = 730
+                        weapon = 2
 
-                cursor.moving_cursor(event.pos)
+                elif event.type == pg.MOUSEMOTION:
+                    if event.pos[1] >= 600:
+                        cursor.image = load_image('cursor.png')
+                        cursor.image = pg.transform.scale(cursor.image, (cursor.size, cursor.size))
+                    else:
+                        cursor.image = load_image('scope.png')
+                        cursor.image = pg.transform.scale(cursor.image, (cursor.size, cursor.size))
 
-            elif event.type == pg.MOUSEBUTTONDOWN:
-                all_sprites.update(event)
+                    cursor.moving_cursor(event.pos)
+
+                elif event.type == pg.MOUSEBUTTONDOWN:
+                    all_sprites.update(event)
+            except:
+                pass
         all_sprites.draw(screen)
         laptops.draw(screen)
-        pg.draw.rect(screen, 'red', (0, 600, 800, 800))
+        lower_fon.draw(screen)
         if pg.mouse.get_focused():
             pg.mouse.set_visible(False)
             cursor_sprite.draw(screen)
@@ -139,6 +186,3 @@ def widow():
             pg.mouse.set_visible(True)
         pg.display.flip()
         clock.tick(FPS)
-
-
-widow()

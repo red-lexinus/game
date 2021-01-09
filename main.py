@@ -2,7 +2,7 @@ import pygame as pg
 import sys
 import os
 from first_window import *
-from setting import *
+from game import *
 
 pg.init()
 size = width, height = 800, 800
