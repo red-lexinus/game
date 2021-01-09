@@ -2,6 +2,8 @@ import pygame as pg
 import sys
 import os
 import random
+import time
+
 pg.init()
 size = width, height = 800, 800
 
@@ -10,6 +12,13 @@ screen = pg.display.set_mode(size)
 FPS = 60
 clock = pg.time.Clock()
 weapon = 1
+launch_time = time.time()
+the_current_time = time.time()
+
+
+def new_time():
+    return time.time()
+
 
 def load_image(name, colorkey=None):
     fullname = os.path.join('data', name)
@@ -85,6 +94,22 @@ def return_laptop_sprite_group():
     return all_sprites
 
 
+def draw_time(time):
+    font = pg.font.Font(None, 30)
+    text = font.render("время до победы", True, (0, 0, 0))
+    text_x = 600
+    text_y = 610
+    text_w = text.get_width()
+    text_h = text.get_height()
+    screen.blit(text, (text_x, text_y))
+    text = font.render(str(time), True, (0, 0, 0))
+    text_x = 685
+    text_y = 640
+    text_h += text.get_height()
+    screen.blit(text, (text_x, text_y))
+    pg.draw.rect(screen, (0, 0, 0), (590, 603, text_w + 20, text_h + 30), 1)
+
+
 def return_lower_fon():
     global scope_weapon
     all_sprites = pg.sprite.Group()
@@ -123,8 +148,9 @@ def return_lower_fon():
     return all_sprites
 
 
-def widow(time=60):
-    global  weapon
+def widow(time_to_win=60):
+    global weapon, launch_time, the_current_time
+    launch_time = new_time()
     all_sprites = pg.sprite.Group()
     cursor_sprite = pg.sprite.Group()
     laptops = return_laptop_sprite_group()
@@ -179,6 +205,8 @@ def widow(time=60):
         all_sprites.draw(screen)
         laptops.draw(screen)
         lower_fon.draw(screen)
+        the_current_time = new_time() - launch_time
+        draw_time(int(time_to_win - the_current_time))
         if pg.mouse.get_focused():
             pg.mouse.set_visible(False)
             cursor_sprite.draw(screen)
