@@ -2,8 +2,7 @@ import pygame as pg
 import sys
 import os
 import random
-
-weapon = 0
+import time
 
 pg.init()
 size = width, height = 800, 800
@@ -12,8 +11,6 @@ WIDTH, HEIGHT = width, height
 screen = pg.display.set_mode(size)
 FPS = 60
 clock = pg.time.Clock()
-<<<<<<< Updated upstream
-=======
 weapon = 1
 launch_time = time.time()
 the_current_time = time.time()
@@ -23,7 +20,6 @@ time_of_2_weapon = -99
 
 def new_time():
     return time.time()
->>>>>>> Stashed changes
 
 
 def load_image(name, colorkey=None):
@@ -53,7 +49,7 @@ class Enemy(pg.sprite.Sprite):
     def __init__(self, group, x=300, y=400, size=200):
         super().__init__(group)
         self.size = size
-        self.time_delay = 0
+        self.time_delay = random.randint(0, 200)
         self.live = True
         self.original_y = y
         self.image = load_image('enemy_1.png')
@@ -61,26 +57,20 @@ class Enemy(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = x, y
         self.max_y = size - 20
+        self.damage_flag = True
 
     def update(self, *args):
-        global weapon
+        global weapon, the_current_time, launch_time, time_of_2_weapon, time_of_1_weapon, count_hp
         if args and args[0].type == pg.MOUSEBUTTONDOWN:
-            if weapon == 2:
+            if weapon == 2 and int(10 - the_current_time + time_of_2_weapon) <= 0:
                 self.rect.y = self.original_y
-                self.live = False
-                self.time_delay = random.randint(100, 400)
-                print(self.time_delay)
+                self.live, self.damage_flag = False, True
+                self.time_delay = random.randint(100, 500)
             elif self.rect.collidepoint(args[0].pos) and self.live:
-                if weapon == 1:
+                if weapon == 1 and int(2 - the_current_time + time_of_1_weapon) <= 0:
                     self.rect.y = self.original_y
-                    self.live = False
+                    self.live, self.damage_flag = False, True
                     self.time_delay = random.randint(50, 250)
-                    print(self.time_delay)
-                elif weapon == 0:
-                    self.rect.y = self.original_y
-                    self.live = False
-                    self.time_delay = random.randint(50, 250)
-                    print(self.time_delay)
         elif self.time_delay > 0:
             self.time_delay -= 1
         elif not self.live:
@@ -89,6 +79,10 @@ class Enemy(pg.sprite.Sprite):
             self.rect.y -= 1
         else:
             pass
+        if self.rect.y == 120 and self.damage_flag:
+            self.damage_flag = False
+            count_hp -= 1
+            print(count_hp)
 
 
 def return_laptop_sprite_group():
@@ -104,9 +98,6 @@ def return_laptop_sprite_group():
     return all_sprites
 
 
-<<<<<<< Updated upstream
-def widow():
-=======
 def draw_time_to_win(time):
     font = pg.font.Font(None, 30)
     text = font.render("время до победы", True, (0, 0, 0))
@@ -186,14 +177,15 @@ def return_lower_fon():
     return all_sprites
 
 
-def widow(time_to_win=10):
-    global weapon, launch_time, the_current_time, time_of_1_weapon, time_of_2_weapon
+def widow(time_to_win=60, hp=3):
+    global weapon, launch_time, the_current_time, time_of_1_weapon, time_of_2_weapon, count_hp
+    count_hp = hp
     launch_time = new_time()
->>>>>>> Stashed changes
     all_sprites = pg.sprite.Group()
     cursor_sprite = pg.sprite.Group()
     laptops = return_laptop_sprite_group()
     cursor = Scope(cursor_sprite)
+    lower_fon = return_lower_fon()
     bot_interaction_flag = False
     Enemy(all_sprites, 50, 300)
     Enemy(all_sprites, 300, 300)
@@ -204,7 +196,6 @@ def widow(time_to_win=10):
             all_sprites.update(n)
         screen.fill('white')
         for event in pg.event.get():
-<<<<<<< Updated upstream
             if not bot_interaction_flag:
                 n = event
                 bot_interaction_flag = True
@@ -229,69 +220,65 @@ def widow(time_to_win=10):
                 all_sprites.update(event)
         all_sprites.draw(screen)
         laptops.draw(screen)
-        pg.draw.rect(screen, 'red', (0, 600, 800, 800))
-=======
-            try:
-                if not bot_interaction_flag:
-                    n = event
-                    bot_interaction_flag = True
+        try:
+            if not bot_interaction_flag:
+                n = event
+                bot_interaction_flag = True
 
-                elif event.type == pg.QUIT:
-                    pg.quit()
-                    sys.exit()
-                elif event.type == 768:
-                    if event.unicode == '':
-                        return
-                elif event.type == pg.KEYUP:
-                    if event.unicode == '1':
+            elif event.type == pg.QUIT:
+                pg.quit()
+                sys.exit()
+            elif event.type == 768:
+                if event.unicode == '':
+                    return
+            elif event.type == pg.KEYUP:
+                if event.unicode == '1':
+                    scope_weapon.rect.x = 96
+                    scope_weapon.rect.y = 620
+                    weapon = 1
+                elif event.unicode == '2':
+                    scope_weapon.rect.x = 100
+                    scope_weapon.rect.y = 730
+                    weapon = 2
+
+            elif event.type == pg.MOUSEMOTION:
+                if event.pos[1] >= 600:
+                    cursor.image = load_image('cursor.png')
+                    cursor.image = pg.transform.scale(cursor.image, (cursor.size, cursor.size))
+                else:
+                    cursor.image = load_image('scope.png')
+                    cursor.image = pg.transform.scale(cursor.image, (cursor.size, cursor.size))
+
+                cursor.moving_cursor(event.pos)
+
+            elif event.type == pg.MOUSEBUTTONDOWN:
+                if event.pos[1] >= 600:
+                    if event.pos[0] <= 170 and event.pos[1] < 700:
                         scope_weapon.rect.x = 96
                         scope_weapon.rect.y = 620
                         weapon = 1
-                    elif event.unicode == '2':
+                    elif event.pos[0] <= 170 and event.pos[1] >= 700:
                         scope_weapon.rect.x = 100
                         scope_weapon.rect.y = 730
                         weapon = 2
+                else:
 
-                elif event.type == pg.MOUSEMOTION:
-                    if event.pos[1] >= 600:
-                        cursor.image = load_image('cursor.png')
-                        cursor.image = pg.transform.scale(cursor.image, (cursor.size, cursor.size))
+                    if weapon == 1:
+                        if (int(2 - the_current_time + time_of_1_weapon)) <= 0:
+                            time_of_1_weapon = new_time() - launch_time
                     else:
-                        cursor.image = load_image('scope.png')
-                        cursor.image = pg.transform.scale(cursor.image, (cursor.size, cursor.size))
+                        if (int(10 - the_current_time + time_of_2_weapon)) <= 0:
+                            time_of_2_weapon = new_time() - launch_time
 
-                    cursor.moving_cursor(event.pos)
-
-                elif event.type == pg.MOUSEBUTTONDOWN:
-                    if event.pos[1] >= 600:
-                        if event.pos[0] <= 170 and event.pos[1] < 700:
-                            scope_weapon.rect.x = 96
-                            scope_weapon.rect.y = 620
-                            weapon = 1
-                        elif event.pos[0] <= 170 and event.pos[1] >= 700:
-                            scope_weapon.rect.x = 100
-                            scope_weapon.rect.y = 730
-                            weapon = 2
-                    else:
-
-                        if weapon == 1:
-                            if (1 - the_current_time + time_of_1_weapon) < 0:
-                                time_of_1_weapon = new_time() - launch_time
-                                all_sprites.update(event)
-                        else:
-                            if (10 - the_current_time + time_of_2_weapon) < 0:
-                                time_of_2_weapon = new_time() - launch_time
-                                all_sprites.update(event)
-            except:
-                pass
+        except:
+            pass
         all_sprites.draw(screen)
         laptops.draw(screen)
         lower_fon.draw(screen)
         the_current_time = new_time() - launch_time
         draw_time_to_win(int(time_to_win - the_current_time))
         draw_time_of_restarting_weapons(int(2 - the_current_time + time_of_1_weapon),
-                                        int(11 - the_current_time + time_of_2_weapon))
->>>>>>> Stashed changes
+                                        int(10 - the_current_time + time_of_2_weapon))
         if pg.mouse.get_focused():
             pg.mouse.set_visible(False)
             cursor_sprite.draw(screen)
@@ -299,11 +286,9 @@ def widow(time_to_win=10):
             pg.mouse.set_visible(True)
         pg.display.flip()
         clock.tick(FPS)
-<<<<<<< Updated upstream
-
-
-widow()
-=======
         if (time_to_win - the_current_time) < 0:
+            # возвращаем победу
             return True
->>>>>>> Stashed changes
+        elif count_hp <= 0:
+            # возвращаем порожение
+            return False

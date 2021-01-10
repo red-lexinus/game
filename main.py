@@ -2,7 +2,7 @@ import pygame as pg
 import sys
 import os
 from first_window import *
-from setting import *
+from game import *
 
 pg.init()
 size = width, height = 800, 800
@@ -13,4 +13,4 @@ FPS = 60
 clock = pg.time.Clock()
 pg.display.set_caption("Перемещение героя")  # заголовок
 setting_widow()
-widow(100)
+widow()
