@@ -216,7 +216,7 @@ def return_lower_fon():
     return all_sprites
 
 
-def widow(time_to_win=60, hp=3, weapon_1_time=2, weapon_2_time=10, level_of_difficulty=7):
+def widow(time_to_win=60, hp=3, weapon_1_time=2, weapon_2_time=10, level_of_difficulty=2):
     global weapon, launch_time, the_current_time, time_of_1_weapon, time_of_2_weapon, \
         count_hp, weapon_1_t, weapon_2_t, hearts
     hearts = Hearts(hp)
