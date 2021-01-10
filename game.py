@@ -46,10 +46,11 @@ class Scope(pg.sprite.Sprite):
 
 
 class Enemy(pg.sprite.Sprite):
-    def __init__(self, group, x=300, y=400, size=200):
+    def __init__(self, group, level_of_difficulty=1, x=300, y=400, size=200):
         super().__init__(group)
+        self.level_of_difficulty = level_of_difficulty
         self.size = size
-        self.time_delay = random.randint(0, 200)
+        self.time_delay = random.randint(0, 50 + (50 // level_of_difficulty))
         self.live = True
         self.original_y = y
         self.image = load_image('enemy_1.png')
@@ -60,29 +61,36 @@ class Enemy(pg.sprite.Sprite):
         self.damage_flag = True
 
     def update(self, *args):
-        global weapon, the_current_time, launch_time, time_of_2_weapon, time_of_1_weapon, count_hp
+        global weapon, the_current_time, launch_time, time_of_2_weapon, time_of_1_weapon, \
+            count_hp, weapon_1_t, weapon_2_t, hearts
         if args and args[0].type == pg.MOUSEBUTTONDOWN:
-            if weapon == 2 and int(10 - the_current_time + time_of_2_weapon) <= 0:
+            if weapon == 2 and int(weapon_2_t - the_current_time + time_of_2_weapon) <= 0:
                 self.rect.y = self.original_y
                 self.live, self.damage_flag = False, True
-                self.time_delay = random.randint(100, 500)
+                self.time_delay = random.randint(100, 400 + 100 // self.level_of_difficulty)
             elif self.rect.collidepoint(args[0].pos) and self.live:
-                if weapon == 1 and int(2 - the_current_time + time_of_1_weapon) <= 0:
+                if weapon == 1 and int(weapon_1_t - the_current_time + time_of_1_weapon) <= 0:
                     self.rect.y = self.original_y
                     self.live, self.damage_flag = False, True
-                    self.time_delay = random.randint(50, 250)
+                    self.time_delay = random.randint(50, 200 + 50 // self.level_of_difficulty)
         elif self.time_delay > 0:
             self.time_delay -= 1
         elif not self.live:
             self.live = True
         elif self.rect.y + self.max_y > self.original_y:
+            number = random.randint(1, 10)
+            if number <= self.level_of_difficulty:
+                self.rect.y -= self.level_of_difficulty
             self.rect.y -= 1
         else:
             pass
-        if self.rect.y == 120 and self.damage_flag:
+        if self.rect.y <= 120 and self.damage_flag:
             self.damage_flag = False
             count_hp -= 1
-            print(count_hp)
+            self.rect.y = self.original_y
+            self.live, self.damage_flag = False, True
+            self.time_delay = random.randint(50, 200 + 50 // self.level_of_difficulty)
+            hearts.remove_hp()
 
 
 def return_laptop_sprite_group():
@@ -98,20 +106,51 @@ def return_laptop_sprite_group():
     return all_sprites
 
 
+class Hearts():
+    def __init__(self, hp):
+        self.max_hp = hp
+        self.now_hp = hp
+        self.arr_hp = []
+        self.sprites = pg.sprite.Group()
+        for i in range(hp):
+            self.arr_hp.append(pg.sprite.Sprite())
+            self.arr_hp[i].image = load_image("heart.png")
+            self.arr_hp[i].image = pg.transform.scale(self.arr_hp[i].image, (50, 50))
+            self.arr_hp[i].rect = self.arr_hp[i].image.get_rect()
+            self.sprites.add(self.arr_hp[i])
+            self.arr_hp[i].rect.x = 740 - 50 * i
+            self.arr_hp[i].rect.y = 610
+
+    def remove_hp(self):
+        self.now_hp -= 1
+        self.arr_hp[self.now_hp].image = load_image("heart_2.png")
+        self.arr_hp[self.now_hp].image = pg.transform.scale(self.arr_hp[self.now_hp].image, (50, 50))
+
+    def add_hp(self):
+        if self.now_hp < self.max_hp:
+            self.now_hp += 1
+            self.arr_hp[self.now_hp].image = load_image("heart.png")
+            self.arr_hp[self.now_hp].image = pg.transform.scale(self.arr_hp[self.now_hp].image, (50, 50))
+
+    def draw_hearts(self):
+        self.sprites.draw(screen)
+        pg.draw.rect(screen, (0, 0, 0), (800 - 15 - 50 * self.max_hp, 600, 50 * self.max_hp + 15, 70), 1)
+
+
 def draw_time_to_win(time):
     font = pg.font.Font(None, 30)
     text = font.render("время до победы", True, (0, 0, 0))
-    text_x = 600
-    text_y = 610
+    text_x = 615
+    text_y = 670
     text_w = text.get_width()
     text_h = text.get_height()
     screen.blit(text, (text_x, text_y))
     text = font.render(str(time), True, (0, 0, 0))
-    text_x = 685
-    text_y = 640
+    text_x = 695
+    text_y = 700
     text_h += text.get_height()
     screen.blit(text, (text_x, text_y))
-    pg.draw.rect(screen, (0, 0, 0), (590, 603, text_w + 20, text_h + 30), 1)
+    pg.draw.rect(screen, (0, 0, 0), (602, 669, text_w + 20, text_h + 20), 1)
 
 
 def draw_time_of_restarting_weapons(time_1, time_2):
@@ -177,8 +216,12 @@ def return_lower_fon():
     return all_sprites
 
 
-def widow(time_to_win=60, hp=3):
-    global weapon, launch_time, the_current_time, time_of_1_weapon, time_of_2_weapon, count_hp
+def widow(time_to_win=60, hp=3, weapon_1_time=2, weapon_2_time=10, level_of_difficulty=7):
+    global weapon, launch_time, the_current_time, time_of_1_weapon, time_of_2_weapon, \
+        count_hp, weapon_1_t, weapon_2_t, hearts
+    hearts = Hearts(hp)
+    weapon_1_t = weapon_1_time
+    weapon_2_t = weapon_2_time
     count_hp = hp
     launch_time = new_time()
     all_sprites = pg.sprite.Group()
@@ -187,9 +230,9 @@ def widow(time_to_win=60, hp=3):
     cursor = Scope(cursor_sprite)
     lower_fon = return_lower_fon()
     bot_interaction_flag = False
-    Enemy(all_sprites, 50, 300)
-    Enemy(all_sprites, 300, 300)
-    Enemy(all_sprites, 550, 300)
+    Enemy(all_sprites, level_of_difficulty, 50, 300)
+    Enemy(all_sprites, level_of_difficulty, 300, 300)
+    Enemy(all_sprites, level_of_difficulty, 550, 300)
 
     while True:
         if bot_interaction_flag:
@@ -264,10 +307,10 @@ def widow(time_to_win=60, hp=3):
                 else:
 
                     if weapon == 1:
-                        if (int(2 - the_current_time + time_of_1_weapon)) <= 0:
+                        if (int(weapon_1_t - the_current_time + time_of_1_weapon)) <= 0:
                             time_of_1_weapon = new_time() - launch_time
                     else:
-                        if (int(10 - the_current_time + time_of_2_weapon)) <= 0:
+                        if (int(weapon_2_t - the_current_time + time_of_2_weapon)) <= 0:
                             time_of_2_weapon = new_time() - launch_time
 
         except:
@@ -277,8 +320,9 @@ def widow(time_to_win=60, hp=3):
         lower_fon.draw(screen)
         the_current_time = new_time() - launch_time
         draw_time_to_win(int(time_to_win - the_current_time))
-        draw_time_of_restarting_weapons(int(2 - the_current_time + time_of_1_weapon),
-                                        int(10 - the_current_time + time_of_2_weapon))
+        draw_time_of_restarting_weapons(int(weapon_1_t - the_current_time + time_of_1_weapon),
+                                        int(weapon_2_t - the_current_time + time_of_2_weapon))
+        hearts.draw_hearts()
         if pg.mouse.get_focused():
             pg.mouse.set_visible(False)
             cursor_sprite.draw(screen)
