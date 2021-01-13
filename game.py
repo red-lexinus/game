@@ -4,6 +4,7 @@ import os
 import random
 import time
 
+
 pg.init()
 size = width, height = 800, 800
 
@@ -248,7 +249,7 @@ def widow(time_to_win=60, hp=3, weapon_1_time=2, weapon_2_time=10, level_of_diff
                 sys.exit()
             elif event.type == 768:
                 if event.unicode == '':
-                    return
+                    return 0
             elif event.type == pg.MOUSEMOTION:
                 if event.pos[1] >= 600:
                     cursor.image = load_image('cursor.png')

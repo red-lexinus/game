@@ -21,18 +21,26 @@ def load_image(name, colorkey=None):
     return image
 
 
-def setting_widow():
+class Scope(pg.sprite.Sprite):
+    def __init__(self, group, size=50):
+        super().__init__(group)
+        self.size = size
+        self.image = load_image('scope.png')
+        self.image = pg.transform.scale(self.image, (self.size, self.size))
+        self.rect = self.image.get_rect()
+        self.rect.x, self.rect.y = 0, 0
+
+    def moving_cursor(self, new_pos):
+        self.rect.x, self.rect.y = new_pos[0] - 25, new_pos[1] - 18
+
+
+def welcome_window():
     flag = False
     y_pos = 0
     x = 1
     v = 100  # пикселей в секунду
     fon = load_image('fon.png')
     screen.blit(fon, (0, 0))
-    # font = pg.font.Font(None, 30)
-    # text = font.render("Погнали!!!!!!", True, 'red')
-    # screen.blit(text, (10, 10))
-    # text = font.render("Просто вжаривайте!!!!!!", True, 'red')
-    # screen.blit(text, (10, 30))
 
     while True:
         for event in pg.event.get():
@@ -41,7 +49,7 @@ def setting_widow():
                 sys.exit()
             elif event.type == 768:
                 if event.unicode == '':
-                    return
+                    return 0
             elif flag and event.type == pg.MOUSEBUTTONDOWN:
                 try:
                     if event.button == 4:
