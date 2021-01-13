@@ -94,17 +94,7 @@ def return_exit_button():
     s.add(sprite)
     return s
 
-class Scope(pg.sprite.Sprite):
-    def __init__(self, group, size=50):
-        super().__init__(group)
-        self.size = size
-        self.image = load_image('scope.png')
-        self.image = pg.transform.scale(self.image, (self.size, self.size))
-        self.rect = self.image.get_rect()
-        self.rect.x, self.rect.y = 0, 0
 
-    def moving_cursor(self, new_pos):
-        self.rect.x, self.rect.y = new_pos[0] - 25, new_pos[1] - 18
 
 def draw_txt():
     font = pg.font.Font(None, 50)
@@ -123,7 +113,7 @@ def draw_txt():
 
 
 def settings_window():
-    global result
+
     result = []
     exit_button = return_exit_button()
     recharge_rate = Buttons()  # перезарядка
@@ -181,10 +171,11 @@ def settings_window():
                 result.append(return_result(speed_bot))
                 return widow(result[1], result[2], result[0][0], result[0][1], result[3])
             else:
-                recharge_rate.sprites.update(recharge_rate.sprites, event)
-                time_to_win.sprites.update(time_to_win.sprites, event)
-                quantity_of_life.sprites.update(quantity_of_life.sprites, event)
-                speed_bot.sprites.update(speed_bot.sprites, event)
+                if event.type == pg.MOUSEBUTTONDOWN:
+                    recharge_rate.sprites.update(recharge_rate.sprites, event)
+                    time_to_win.sprites.update(time_to_win.sprites, event)
+                    quantity_of_life.sprites.update(quantity_of_life.sprites, event)
+                    speed_bot.sprites.update(speed_bot.sprites, event)
         fon = pg.transform.scale(load_image('fon_12.png'), (800, 800))
         screen.blit(fon, (0, 0))
         recharge_rate.draw_buttons()

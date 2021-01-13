@@ -68,12 +68,12 @@ class Enemy(pg.sprite.Sprite):
             if weapon == 2 and int(weapon_2_t - the_current_time + time_of_2_weapon) <= 0:
                 self.rect.y = self.original_y
                 self.live, self.damage_flag = False, True
-                self.time_delay = random.randint(100, 400 + 100 // self.level_of_difficulty)
+                self.time_delay = random.randint(100, 400 + 100)
             elif self.rect.collidepoint(args[0].pos) and self.live:
                 if weapon == 1 and int(weapon_1_t - the_current_time + time_of_1_weapon) <= 0:
                     self.rect.y = self.original_y
                     self.live, self.damage_flag = False, True
-                    self.time_delay = random.randint(50, 200 + 50 // self.level_of_difficulty)
+                    self.time_delay = random.randint(50, 200 + 50)
         elif self.time_delay > 0:
             self.time_delay -= 1
         elif not self.live:
@@ -90,7 +90,7 @@ class Enemy(pg.sprite.Sprite):
             count_hp -= 1
             self.rect.y = self.original_y
             self.live, self.damage_flag = False, True
-            self.time_delay = random.randint(50, 200 + 50 // self.level_of_difficulty)
+            self.time_delay = random.randint(50, 200 + 50)
             hearts.remove_hp()
 
 
@@ -234,7 +234,6 @@ def widow(time_to_win=60, hp=3, weapon_1_time=2, weapon_2_time=10, level_of_diff
     Enemy(all_sprites, level_of_difficulty, 50, 300)
     Enemy(all_sprites, level_of_difficulty, 300, 300)
     Enemy(all_sprites, level_of_difficulty, 550, 300)
-
     while True:
         if bot_interaction_flag:
             all_sprites.update(n)
