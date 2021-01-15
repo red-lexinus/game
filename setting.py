@@ -8,7 +8,7 @@ size = width, height = 800, 800
 
 WIDTH, HEIGHT = width, height
 screen = pg.display.set_mode(size)
-FPS = 60
+FPS = 1000
 clock = pg.time.Clock()
 
 
@@ -95,7 +95,6 @@ def return_exit_button():
     return s
 
 
-
 def draw_txt():
     font = pg.font.Font(None, 50)
     text = font.render('Настройте же сложность своей игры', True, ('white'))
@@ -113,7 +112,6 @@ def draw_txt():
 
 
 def settings_window():
-
     result = []
     exit_button = return_exit_button()
     recharge_rate = Buttons()  # перезарядка
@@ -134,8 +132,8 @@ def settings_window():
     quantity_of_life.add_button(550, 450, 250, 5)
     # кнопки
     speed_bot.add_button(10, 600, 250, 1)
-    speed_bot.add_button(280, 600, 250, 5)
-    speed_bot.add_button(550, 600, 250, 10)
+    speed_bot.add_button(280, 600, 250, 2)
+    speed_bot.add_button(550, 600, 250, 3)
     #
     recharge_rate.arr_buttons[1].change_png()
     time_to_win.arr_buttons[0].change_png()
@@ -162,7 +160,11 @@ def settings_window():
                 sys.exit()
             elif event.type == 768:
                 if event.unicode == '':
-                    return
+                    result.append(return_result(recharge_rate))
+                    result.append(return_result(time_to_win))
+                    result.append(return_result(quantity_of_life))
+                    result.append(return_result(speed_bot))
+                    return widow(result[1], result[2], result[0][0], result[0][1], result[3])
             elif event.type == pg.MOUSEBUTTONDOWN and event.pos[0] >= 300 and event.pos[1] >= 700 and event.pos[
                 0] <= 550:
                 result.append(return_result(recharge_rate))
@@ -186,4 +188,3 @@ def settings_window():
         draw_txt()
         pg.display.flip()
         clock.tick(FPS)
-

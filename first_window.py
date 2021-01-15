@@ -1,13 +1,14 @@
 import pygame as pg
 import sys
 import os
+from setting import *
 
 pg.init()
 size = width, height = 800, 800
 
 WIDTH, HEIGHT = width, height
 screen = pg.display.set_mode(size)
-FPS = 60
+FPS = 1000
 clock = pg.time.Clock()
 
 
@@ -35,7 +36,7 @@ def welcome_window():
                 sys.exit()
             elif event.type == 768:
                 if event.unicode == '':
-                    return 0
+                    return settings_window()
             elif flag and event.type == pg.MOUSEBUTTONDOWN:
                 try:
                     if event.button == 4:
