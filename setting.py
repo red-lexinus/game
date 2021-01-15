@@ -164,14 +164,14 @@ def settings_window():
                     result.append(return_result(time_to_win))
                     result.append(return_result(quantity_of_life))
                     result.append(return_result(speed_bot))
-                    return widow(result[1], result[2], result[0][0], result[0][1], result[3])
+                    return gameplay(result[1], result[2], result[0][0], result[0][1], result[3])
             elif event.type == pg.MOUSEBUTTONDOWN and event.pos[0] >= 300 and event.pos[1] >= 700 and event.pos[
                 0] <= 550:
                 result.append(return_result(recharge_rate))
                 result.append(return_result(time_to_win))
                 result.append(return_result(quantity_of_life))
                 result.append(return_result(speed_bot))
-                return widow(result[1], result[2], result[0][0], result[0][1], result[3])
+                return gameplay(result[1], result[2], result[0][0], result[0][1], result[3])
             else:
                 if event.type == pg.MOUSEBUTTONDOWN:
                     recharge_rate.sprites.update(recharge_rate.sprites, event)
