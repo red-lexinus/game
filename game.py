@@ -12,11 +12,6 @@ WIDTH, HEIGHT = width, height
 screen = pg.display.set_mode(size)
 FPS = 1000
 clock = pg.time.Clock()
-weapon = 1
-launch_time = time.time()
-the_current_time = time.time()
-time_of_1_weapon = -99
-time_of_2_weapon = -99
 
 
 def new_time():
@@ -293,6 +288,11 @@ def return_lower_fon():
 def widow(time_to_win=60, hp=5, weapon_1_time=2, weapon_2_time=10, level_of_difficulty=2):
     global weapon, launch_time, the_current_time, time_of_1_weapon, time_of_2_weapon, \
         count_hp, weapon_1_t, weapon_2_t, hearts
+    weapon = 1
+    launch_time = time.time()
+    the_current_time = time.time()
+    time_of_1_weapon = -99
+    time_of_2_weapon = -99
     pause_flag = False
     hearts = Hearts(hp)
     weapon_1_t = weapon_1_time
